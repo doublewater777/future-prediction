@@ -78,8 +78,46 @@ class DeepSeekLLM(BaseLLM):
                 return ""
                 
         except Exception as e:
-            print(f"DeepSeek API调用错误: {str(e)}")
-            raise e
+            error_message = str(e)
+            
+            # 处理特定的错误类型
+            if "402" in error_message or "Insufficient Balance" in error_message:
+                detailed_error = (
+                    "❌ DeepSeek API 余额不足！\n"
+                    "📋 解决方案：\n"
+                    "1. 请访问 https://platform.deepseek.com/ 充值账户\n"
+                    "2. 或者切换到 OpenAI 模型（在 config.py 中设置 OPENAI_API_KEY 和 DEFAULT_LLM_PROVIDER='openai'）\n"
+                    "3. 检查 API Key 是否正确配置\n"
+                    f"错误详情: {error_message}"
+                )
+                print(detailed_error)
+                raise ValueError(detailed_error) from e
+            elif "401" in error_message or "Invalid API Key" in error_message or "Unauthorized" in error_message:
+                detailed_error = (
+                    "❌ DeepSeek API Key 无效或未授权！\n"
+                    "📋 解决方案：\n"
+                    "1. 检查 config.py 中的 DEEPSEEK_API_KEY 是否正确\n"
+                    "2. 访问 https://platform.deepseek.com/ 获取有效的 API Key\n"
+                    "3. 确保 API Key 没有过期或被撤销\n"
+                    f"错误详情: {error_message}"
+                )
+                print(detailed_error)
+                raise ValueError(detailed_error) from e
+            elif "429" in error_message or "Rate limit" in error_message:
+                detailed_error = (
+                    "❌ DeepSeek API 请求频率超限！\n"
+                    "📋 解决方案：\n"
+                    "1. 请稍后再试\n"
+                    "2. 减少并发请求数量\n"
+                    "3. 考虑升级 API 套餐以提高速率限制\n"
+                    f"错误详情: {error_message}"
+                )
+                print(detailed_error)
+                raise ValueError(detailed_error) from e
+            else:
+                detailed_error = f"DeepSeek API调用错误: {error_message}"
+                print(detailed_error)
+                raise e
     
     def get_model_info(self) -> Dict[str, Any]:
         """

@@ -18,27 +18,43 @@ from src import DeepSearchAgent, Config
 def main():
     """主函数"""
     st.set_page_config(
-        page_title="Deep Search Agent",
-        page_icon="🔍",
+        page_title="未来简事",
+        page_icon="🔮",
         layout="wide"
     )
     
-    st.title("Deep Search Agent")
-    st.markdown("基于DeepSeek的无框架深度搜索AI代理")
+    st.title("🔮 未来简事")
+    st.markdown("**智能未来趋势预测与分析工具** - 通过多轮搜索和反思，帮你了解未来可能发生的事情")
     
     # 侧边栏配置
     with st.sidebar:
-        st.header("配置")
+        st.header("⚙️ 配置")
+        
+        # 未来简事配置
+        st.subheader("🔮 未来简事设置")
+        time_horizon = st.selectbox(
+            "时间范围",
+            ["1个月", "3个月", "6个月", "1年", "3年", "5年"],
+            index=1,
+            help="选择要预测的未来时间范围"
+        )
+        
+        analysis_angles = st.multiselect(
+            "分析角度（可选）",
+            ["技术", "经济", "社会", "环境", "政治", "文化", "健康", "教育"],
+            default=["技术", "经济", "社会"],
+            help="选择要从哪些角度分析未来趋势"
+        )
         
         # API密钥配置
-        st.subheader("API密钥")
+        st.subheader("🔑 API密钥")
         deepseek_key = st.text_input("DeepSeek API Key", type="password", 
                                    value="")
         tavily_key = st.text_input("Tavily API Key", type="password",
                                  value="")
         
         # 高级配置
-        st.subheader("高级配置")
+        st.subheader("⚙️ 高级配置")
         max_reflections = st.slider("反思次数", 1, 5, 2)
         max_search_results = st.slider("搜索结果数", 1, 10, 3)
         max_content_length = st.number_input("最大内容长度", 1000, 50000, 20000)
@@ -57,21 +73,25 @@ def main():
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        st.header("研究查询")
+        st.header("🔮 未来预测查询")
         query = st.text_area(
-            "请输入您要研究的问题",
-            placeholder="例如：2025年人工智能发展趋势",
-            height=100
+            "请输入您想了解的未来话题",
+            placeholder="例如：人工智能的发展",
+            height=100,
+            help="输入您想了解的未来趋势或可能发生的事件"
         )
         
         # 预设查询示例
-        st.subheader("示例查询")
+        st.subheader("💡 示例查询")
         example_queries = [
-            "2025年人工智能发展趋势",
-            "深度学习在医疗领域的应用",
-            "区块链技术的最新发展",
-            "可持续能源技术趋势",
-            "量子计算的发展现状"
+            "人工智能的发展",
+            "电动汽车市场",
+            "远程办公趋势",
+            "气候变化影响",
+            "太空探索进展",
+            "生物技术突破",
+            "数字货币发展",
+            "教育模式变革"
         ]
         
         selected_example = st.selectbox("选择示例查询", ["自定义"] + example_queries)
@@ -122,7 +142,9 @@ def main():
             max_reflections=max_reflections,
             max_search_results=max_search_results,
             max_content_length=max_content_length,
-            output_dir="streamlit_reports"
+            output_dir="streamlit_reports",
+            time_horizon=time_horizon,
+            analysis_angles=analysis_angles if analysis_angles else None
         )
         
         # 执行研究
@@ -186,10 +208,10 @@ def execute_research(query: str, config: Config):
 
 def display_results(agent: DeepSearchAgent, final_report: str):
     """显示研究结果"""
-    st.header("研究结果")
+    st.header("📊 预测结果")
     
     # 结果标签页
-    tab1, tab2, tab3 = st.tabs(["最终报告", "详细信息", "下载"])
+    tab1, tab2, tab3 = st.tabs(["📄 完整报告", "🔍 详细信息", "💾 下载"])
     
     with tab1:
         st.markdown(final_report)

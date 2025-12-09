@@ -67,24 +67,44 @@ class DeepSearchAgent:
     
     def _initialize_nodes(self):
         """初始化处理节点"""
-        self.first_search_node = FirstSearchNode(self.llm_client)
-        self.reflection_node = ReflectionNode(self.llm_client)
-        self.first_summary_node = FirstSummaryNode(self.llm_client)
-        self.reflection_summary_node = ReflectionSummaryNode(self.llm_client)
-        self.report_formatting_node = ReportFormattingNode(self.llm_client)
+        # 获取时间范围（未来简事专用）
+        time_horizon = getattr(self.config, 'time_horizon', None)
+        
+        self.first_search_node = FirstSearchNode(self.llm_client, time_horizon=time_horizon)
+        self.reflection_node = ReflectionNode(self.llm_client, time_horizon=time_horizon)
+        self.first_summary_node = FirstSummaryNode(self.llm_client, time_horizon=time_horizon)
+        self.reflection_summary_node = ReflectionSummaryNode(self.llm_client, time_horizon=time_horizon)
+        self.report_formatting_node = ReportFormattingNode(self.llm_client, time_horizon=time_horizon)
     
-    def research(self, query: str, save_report: bool = True) -> str:
+    def research(self, query: str, save_report: bool = True, 
+                 time_horizon: str = None, analysis_angles: list = None) -> str:
         """
-        执行深度研究
+        执行深度研究（未来简事）
         
         Args:
             query: 研究查询
             save_report: 是否保存报告到文件
+            time_horizon: 时间范围（如"3个月"、"1年"等），如果提供则覆盖配置
+            analysis_angles: 分析角度列表（如["技术", "经济"]），如果提供则覆盖配置
             
         Returns:
             最终报告内容
         """
+        # 如果提供了参数，更新配置
+        if time_horizon:
+            self.config.time_horizon = time_horizon
+        if analysis_angles:
+            self.config.analysis_angles = analysis_angles
+        
+        # 重新初始化节点以使用新的配置
+        if time_horizon or analysis_angles:
+            self._initialize_nodes()
+        
         print(f"\n{'='*60}")
+        if self.config.time_horizon:
+            print(f"未来简事 - 时间范围: {self.config.time_horizon}")
+            if self.config.analysis_angles:
+                print(f"分析角度: {', '.join(self.config.analysis_angles)}")
         print(f"开始深度研究: {query}")
         print(f"{'='*60}")
         
@@ -116,8 +136,17 @@ class DeepSearchAgent:
         """生成报告结构"""
         print(f"\n[步骤 1] 生成报告结构...")
         
+        # 获取时间范围和角度（未来简事专用）
+        time_horizon = getattr(self.config, 'time_horizon', None)
+        analysis_angles = getattr(self.config, 'analysis_angles', None)
+        
         # 创建报告结构节点
-        report_structure_node = ReportStructureNode(self.llm_client, query)
+        report_structure_node = ReportStructureNode(
+            self.llm_client, 
+            query,
+            time_horizon=time_horizon,
+            analysis_angles=analysis_angles
+        )
         
         # 生成结构并更新状态
         self.state = report_structure_node.mutate_state(state=self.state)
@@ -216,8 +245,11 @@ class DeepSearchAgent:
                 "paragraph_latest_state": paragraph.research.latest_summary
             }
             
-            # 生成反思搜索查询
-            reflection_output = self.reflection_node.run(reflection_input)
+            # 生成反思搜索查询，传递反思轮次信息
+            reflection_output = self.reflection_node.run(
+                reflection_input, 
+                reflection_iteration=reflection_i
+            )
             search_query = reflection_output["search_query"]
             reasoning = reflection_output["reasoning"]
             
@@ -249,9 +281,12 @@ class DeepSearchAgent:
                 "paragraph_latest_state": paragraph.research.latest_summary
             }
             
-            # 更新状态
+            # 更新状态，传递反思轮次信息
             self.state = self.reflection_summary_node.mutate_state(
-                reflection_summary_input, self.state, paragraph_index
+                reflection_summary_input, 
+                self.state, 
+                paragraph_index,
+                reflection_iteration=reflection_i
             )
             
             print(f"    反思 {reflection_i + 1} 完成")

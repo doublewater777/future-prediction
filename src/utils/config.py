@@ -5,7 +5,7 @@
 
 import os
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, List
 
 
 @dataclass
@@ -29,6 +29,10 @@ class Config:
     # Agent配置
     max_reflections: int = 2
     max_paragraphs: int = 5
+    
+    # 未来简事配置
+    time_horizon: Optional[str] = None  # 时间范围：1个月、3个月、6个月、1年、3年、5年
+    analysis_angles: Optional[List[str]] = None  # 分析角度列表，如：["技术", "经济", "社会", "环境", "政治"]
     
     # 输出配置
     output_dir: str = "reports"
@@ -63,10 +67,15 @@ class Config:
             config_module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(config_module)
             
+            # 优先从环境变量读取 API 密钥，如果没有则从配置文件读取
+            deepseek_key = os.getenv("DEEPSEEK_API_KEY") or getattr(config_module, "DEEPSEEK_API_KEY", None)
+            openai_key = os.getenv("OPENAI_API_KEY") or getattr(config_module, "OPENAI_API_KEY", None)
+            tavily_key = os.getenv("TAVILY_API_KEY") or getattr(config_module, "TAVILY_API_KEY", None)
+            
             return cls(
-                deepseek_api_key=getattr(config_module, "DEEPSEEK_API_KEY", None),
-                openai_api_key=getattr(config_module, "OPENAI_API_KEY", None),
-                tavily_api_key=getattr(config_module, "TAVILY_API_KEY", None),
+                deepseek_api_key=deepseek_key,
+                openai_api_key=openai_key,
+                tavily_api_key=tavily_key,
                 default_llm_provider=getattr(config_module, "DEFAULT_LLM_PROVIDER", "deepseek"),
                 deepseek_model=getattr(config_module, "DEEPSEEK_MODEL", "deepseek-chat"),
                 openai_model=getattr(config_module, "OPENAI_MODEL", "gpt-4o-mini"),
@@ -90,10 +99,15 @@ class Config:
                             key, value = line.split('=', 1)
                             config_dict[key.strip()] = value.strip()
             
+            # 优先从环境变量读取 API 密钥，如果没有则从配置文件读取
+            deepseek_key = os.getenv("DEEPSEEK_API_KEY") or config_dict.get("DEEPSEEK_API_KEY")
+            openai_key = os.getenv("OPENAI_API_KEY") or config_dict.get("OPENAI_API_KEY")
+            tavily_key = os.getenv("TAVILY_API_KEY") or config_dict.get("TAVILY_API_KEY")
+            
             return cls(
-                deepseek_api_key=config_dict.get("DEEPSEEK_API_KEY"),
-                openai_api_key=config_dict.get("OPENAI_API_KEY"),
-                tavily_api_key=config_dict.get("TAVILY_API_KEY"),
+                deepseek_api_key=deepseek_key,
+                openai_api_key=openai_key,
+                tavily_api_key=tavily_key,
                 default_llm_provider=config_dict.get("DEFAULT_LLM_PROVIDER", "deepseek"),
                 deepseek_model=config_dict.get("DEEPSEEK_MODEL", "deepseek-chat"),
                 openai_model=config_dict.get("OPENAI_MODEL", "gpt-4o-mini"),

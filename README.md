@@ -1,11 +1,13 @@
-# Deep Search Agent
+# 🔮 未来简事
 
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![DeepSeek](https://img.shields.io/badge/LLM-DeepSeek-red.svg)](https://platform.deepseek.com/)
 [![Tavily](https://img.shields.io/badge/Search-Tavily-yellow.svg)](https://tavily.com/)
 
-一个**无框架**的深度搜索AI代理实现，能够通过多轮搜索和反思生成高质量的研究报告。
+**智能未来趋势预测与分析工具** - 通过多轮搜索和反思，帮你了解未来可能发生的事情。
+
+> 基于 Deep Search Agent 改造，专注于未来趋势预测和分析
 
 <img src="https://github.com/666ghj/DeepSearchAgent-Demo/blob/main/img/1.png?raw=true" width="70%">
 
@@ -13,44 +15,46 @@
 
 <img src="https://github.com/666ghj/DeepSearchAgent-Demo/blob/main/img/3.png?raw=true" width="70%">
 
-## 特性
+## ✨ 特性
 
-- **无框架设计**: 从零实现，不依赖LangChain等重型框架
-- **多LLM支持**: 支持DeepSeek、OpenAI等主流大语言模型
-- **智能搜索**: 集成Tavily搜索引擎，提供高质量网络搜索
-- **反思机制**: 多轮反思优化，确保研究深度和完整性
-- **状态管理**: 完整的研究过程状态跟踪和恢复
-- **Web界面**: Streamlit友好界面，易于使用
-- **Markdown输出**: 美观的Markdown格式研究报告
+- **🔮 未来预测**: 专注于未来趋势预测，而非历史回顾
+- **⏰ 时间范围选择**: 支持选择1个月、3个月、6个月、1年、3年、5年等不同时间范围
+- **📐 多角度分析**: 可从技术、经济、社会、环境、政治等多个角度分析未来趋势
+- **🤖 多LLM支持**: 支持DeepSeek、OpenAI等主流大语言模型
+- **🔍 智能搜索**: 集成Tavily搜索引擎，自动搜索未来趋势和预测信息
+- **💭 反思机制**: 多轮反思优化，确保预测的深度和完整性
+- **📊 状态管理**: 完整的研究过程状态跟踪和恢复
+- **🌐 Web界面**: Streamlit友好界面，易于使用
+- **📄 Markdown输出**: 美观的Markdown格式预测报告
 
-## 工作原理
+## 🔄 工作原理
 
-Deep Search Agent采用分阶段的研究方法：
+未来简事采用分阶段的未来预测方法：
 
 ```mermaid
 graph TD
-    A[用户查询] --> B[生成报告结构]
+    A[用户查询 + 时间范围 + 分析角度] --> B[生成未来预测报告结构]
     B --> C[遍历每个段落]
-    C --> D[初始搜索]
-    D --> E[生成初始总结]
+    C --> D[搜索未来趋势]
+    D --> E[生成初始预测]
     E --> F[反思循环]
-    F --> G[反思搜索]
-    G --> H[更新总结]
+    F --> G[反思搜索补充]
+    G --> H[更新预测]
     H --> I{达到反思次数?}
     I -->|否| F
     I -->|是| J{所有段落完成?}
     J -->|否| C
-    J -->|是| K[格式化最终报告]
+    J -->|是| K[格式化最终预测报告]
     K --> L[输出报告]
 ```
 
 ### 核心流程
 
-1. **结构生成**: 根据查询生成报告大纲和段落结构
-2. **初始研究**: 为每个段落生成搜索查询并获取相关信息
-3. **初始总结**: 基于搜索结果生成段落初稿
-4. **反思优化**: 多轮反思，发现遗漏并补充搜索
-5. **最终整合**: 将所有段落整合为完整的Markdown报告
+1. **结构生成**: 根据查询、时间范围和角度生成未来预测报告大纲
+2. **趋势搜索**: 为每个段落搜索未来趋势、专家预测、行业分析等信息
+3. **初始预测**: 基于搜索结果生成关于未来可能发生事件的初步预测
+4. **反思优化**: 多轮反思，发现遗漏的未来场景并补充搜索
+5. **最终整合**: 将所有段落整合为完整的Markdown格式未来预测报告
 
 ## 快速开始
 
@@ -81,20 +85,50 @@ pip install -r requirements.txt
 
 ### 4. 配置API密钥
 
-项目根目录下已有`config.py`配置文件，请直接编辑此文件设置您的API密钥：
+**⚠️ 安全提示：** API 密钥是敏感信息，请勿将其提交到版本控制系统！
+
+#### 方式一：使用环境变量（推荐）
+
+这是最安全的方式，API 密钥不会被提交到代码仓库：
+
+**Linux/Mac:**
+```bash
+export DEEPSEEK_API_KEY="your_deepseek_api_key_here"
+export TAVILY_API_KEY="your_tavily_api_key_here"
+export OPENAI_API_KEY="your_openai_api_key_here"  # 可选
+```
+
+**Windows (PowerShell):**
+```powershell
+$env:DEEPSEEK_API_KEY="your_deepseek_api_key_here"
+$env:TAVILY_API_KEY="your_tavily_api_key_here"
+$env:OPENAI_API_KEY="your_openai_api_key_here"  # 可选
+```
+
+**Windows (CMD):**
+```cmd
+set DEEPSEEK_API_KEY=your_deepseek_api_key_here
+set TAVILY_API_KEY=your_tavily_api_key_here
+set OPENAI_API_KEY=your_openai_api_key_here
+```
+
+#### 方式二：使用配置文件
+
+1. 复制配置模板文件：
+```bash
+cp config.example.py config.py
+```
+
+2. 编辑 `config.py` 文件，填入您的 API 密钥：
 
 ```python
 # Deep Search Agent 配置文件
-# 请在这里填入您的API密钥
+import os
 
-# DeepSeek API Key
-DEEPSEEK_API_KEY = "your_deepseek_api_key_here"
-
-# OpenAI API Key (可选)
-OPENAI_API_KEY = "your_openai_api_key_here"
-
-# Tavily搜索API Key
-TAVILY_API_KEY = "your_tavily_api_key_here"
+# API 密钥（优先从环境变量读取）
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "your_deepseek_api_key_here")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "your_openai_api_key_here")
+TAVILY_API_KEY = os.getenv("TAVILY_API_KEY", "your_tavily_api_key_here")
 
 # 配置参数
 DEFAULT_LLM_PROVIDER = "deepseek"
@@ -107,6 +141,8 @@ SEARCH_CONTENT_MAX_LENGTH = 20000
 OUTPUT_DIR = "reports"
 SAVE_INTERMEDIATE_STATES = True
 ```
+
+**注意：** `config.py` 文件已被添加到 `.gitignore`，不会被提交到版本控制。如果使用配置文件方式，请确保不要将包含真实密钥的 `config.py` 文件提交到仓库。
 
 ### 5. 开始使用
 
@@ -132,28 +168,43 @@ python examples/advanced_usage.py
 - 状态管理和恢复
 - 不同模型的使用
 
-### 方式二：Web界面
+### 方式二：Web界面（推荐）
 
 启动Streamlit Web界面：
 ```bash
 streamlit run examples/streamlit_app.py
 ```
-Web界面无需配置文件，直接在界面中输入API密钥即可使用。
+
+Web界面功能：
+- 🎯 选择未来时间范围（1个月到5年）
+- 📐 选择分析角度（技术、经济、社会等）
+- 🔑 直接在界面中输入API密钥
+- 📊 实时查看预测进度
+- 💾 下载预测报告
 
 ### 方式三：编程方式
 
 ```python
-from src import DeepSearchAgent, load_config
+from src import DeepSearchAgent, load_config, Config
 
 # 加载配置
 config = load_config()
 
+# 设置未来简事参数
+config.time_horizon = "3个月"  # 时间范围
+config.analysis_angles = ["技术", "经济", "社会"]  # 分析角度
+
 # 创建Agent
 agent = DeepSearchAgent(config)
 
-# 执行研究
-query = "2025年人工智能发展趋势"
-final_report = agent.research(query, save_report=True)
+# 执行未来预测
+query = "人工智能的发展"
+final_report = agent.research(
+    query, 
+    save_report=True,
+    time_horizon="3个月",
+    analysis_angles=["技术", "经济"]
+)
 
 print(final_report)
 ```
@@ -171,7 +222,9 @@ config = Config(
     deepseek_model="deepseek-chat",
     max_reflections=3,           # 增加反思次数
     max_search_results=5,        # 增加搜索结果数
-    output_dir="my_reports"      # 自定义输出目录
+    output_dir="future_reports", # 自定义输出目录
+    time_horizon="1年",          # 未来时间范围
+    analysis_angles=["技术", "经济", "社会", "环境"]  # 分析角度
 )
 
 # 设置API密钥
@@ -179,6 +232,9 @@ config.deepseek_api_key = "your_api_key"
 config.tavily_api_key = "your_tavily_key"
 
 agent = DeepSearchAgent(config)
+
+# 执行预测
+report = agent.research("电动汽车市场发展")
 ```
 
 ## 项目结构
@@ -363,7 +419,7 @@ class Config:
 
 ## 示例
 
-### 示例1：基本研究
+### 示例1：基本未来预测
 
 ```python
 from src import create_agent
@@ -371,12 +427,12 @@ from src import create_agent
 # 快速创建Agent
 agent = create_agent()
 
-# 执行研究
-report = agent.research("量子计算的发展现状")
+# 执行未来预测（使用配置中的时间范围和角度）
+report = agent.research("量子计算的发展")
 print(report)
 ```
 
-### 示例2：自定义研究参数
+### 示例2：自定义未来预测参数
 
 ```python
 from src import DeepSearchAgent, Config
@@ -384,30 +440,33 @@ from src import DeepSearchAgent, Config
 config = Config(
     max_reflections=4,        # 更深度的反思
     max_search_results=8,     # 更多搜索结果
-    max_paragraphs=6          # 更长的报告
+    max_paragraphs=6,         # 更长的报告
+    time_horizon="1年",       # 预测未来1年
+    analysis_angles=["技术", "社会", "伦理"]  # 从技术、社会、伦理角度分析
 )
 
 agent = DeepSearchAgent(config)
 report = agent.research("人工智能的伦理问题")
 ```
 
-### 示例3：状态管理
+### 示例3：状态管理和进度跟踪
 
 ```python
-# 开始研究
-agent = DeepSearchAgent()
+# 开始未来预测
+config = Config(time_horizon="6个月", analysis_angles=["技术", "经济"])
+agent = DeepSearchAgent(config)
 report = agent.research("区块链技术应用")
 
 # 保存状态
-agent.save_state("blockchain_research.json")
+agent.save_state("blockchain_future.json")
 
 # 稍后恢复状态
-new_agent = DeepSearchAgent()
-new_agent.load_state("blockchain_research.json")
+new_agent = DeepSearchAgent(config)
+new_agent.load_state("blockchain_future.json")
 
 # 检查进度
 progress = new_agent.get_progress_summary()
-print(f"研究进度: {progress['progress_percentage']}%")
+print(f"预测进度: {progress['progress_percentage']}%")
 ```
 
 ## 高级功能
@@ -449,13 +508,32 @@ A:
 
 获取密钥后，直接编辑项目根目录的`config.py`文件填入即可。
 
-### Q: 研究报告质量如何提升？
+### Q: 未来预测报告质量如何提升？
 
 A: 可以通过以下方式优化：
+- 选择合适的时间范围（短期预测通常更准确）
+- 选择多个分析角度，获得更全面的视角
 - 增加`max_reflections`参数（更多反思轮次）
 - 增加`max_search_results`参数（更多搜索结果）
 - 调整`max_content_length`参数（更长的搜索内容）
-- 使用更强大的LLM模型
+- 使用更强大的LLM模型（如GPT-4o）
+
+### Q: 如何选择时间范围？
+
+A: 
+- **1-3个月**: 适合预测近期可能发生的事件和短期趋势
+- **6个月-1年**: 适合预测中期发展趋势和可能的变化
+- **3-5年**: 适合预测长期趋势和重大变革
+
+### Q: 分析角度如何选择？
+
+A: 根据你的查询主题选择相关角度：
+- **技术**: 技术发展趋势、创新突破
+- **经济**: 市场变化、经济影响
+- **社会**: 社会趋势、生活方式变化
+- **环境**: 环境影响、可持续发展
+- **政治**: 政策变化、法规影响
+- 可以多选，获得更全面的分析
 
 ### Q: 如何自定义提示词？
 

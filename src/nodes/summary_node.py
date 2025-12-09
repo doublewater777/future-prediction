@@ -9,7 +9,10 @@ from json.decoder import JSONDecodeError
 
 from .base_node import StateMutationNode
 from ..state.state import State
-from ..prompts import SYSTEM_PROMPT_FIRST_SUMMARY, SYSTEM_PROMPT_REFLECTION_SUMMARY
+from ..prompts import (
+    SYSTEM_PROMPT_FIRST_SUMMARY, SYSTEM_PROMPT_REFLECTION_SUMMARY,
+    get_first_summary_prompt, get_reflection_summary_prompt
+)
 from ..utils.text_processing import (
     remove_reasoning_from_output,
     clean_json_tags,
@@ -21,14 +24,16 @@ from ..utils.text_processing import (
 class FirstSummaryNode(StateMutationNode):
     """根据搜索结果生成段落首次总结的节点"""
     
-    def __init__(self, llm_client):
+    def __init__(self, llm_client, time_horizon: str = None):
         """
         初始化首次总结节点
         
         Args:
             llm_client: LLM客户端
+            time_horizon: 时间范围（未来简事专用）
         """
         super().__init__(llm_client, "FirstSummaryNode")
+        self.time_horizon = time_horizon
     
     def validate_input(self, input_data: Any) -> bool:
         """验证输入数据"""
@@ -67,8 +72,14 @@ class FirstSummaryNode(StateMutationNode):
             
             self.log_info("正在生成首次段落总结")
             
+            # 选择提示词
+            if self.time_horizon:
+                prompt = get_first_summary_prompt(self.time_horizon)
+            else:
+                prompt = SYSTEM_PROMPT_FIRST_SUMMARY
+            
             # 调用LLM
-            response = self.llm_client.invoke(SYSTEM_PROMPT_FIRST_SUMMARY, message)
+            response = self.llm_client.invoke(prompt, message)
             
             # 处理响应
             processed_response = self.process_output(response)
@@ -150,14 +161,16 @@ class FirstSummaryNode(StateMutationNode):
 class ReflectionSummaryNode(StateMutationNode):
     """根据反思搜索结果更新段落总结的节点"""
     
-    def __init__(self, llm_client):
+    def __init__(self, llm_client, time_horizon: str = None):
         """
         初始化反思总结节点
         
         Args:
             llm_client: LLM客户端
+            time_horizon: 时间范围（未来简事专用）
         """
         super().__init__(llm_client, "ReflectionSummaryNode")
+        self.time_horizon = time_horizon
     
     def validate_input(self, input_data: Any) -> bool:
         """验证输入数据"""
@@ -196,8 +209,18 @@ class ReflectionSummaryNode(StateMutationNode):
             
             self.log_info("正在生成反思总结")
             
+            # 获取反思轮次（从kwargs中获取）
+            reflection_iteration = kwargs.get('reflection_iteration', 0)
+            is_critical_reflection = reflection_iteration > 0  # 第二轮及以后为质疑性反思
+            
+            # 选择提示词
+            if self.time_horizon:
+                prompt = get_reflection_summary_prompt(self.time_horizon, is_critical_reflection)
+            else:
+                prompt = SYSTEM_PROMPT_REFLECTION_SUMMARY
+            
             # 调用LLM
-            response = self.llm_client.invoke(SYSTEM_PROMPT_REFLECTION_SUMMARY, message)
+            response = self.llm_client.invoke(prompt, message)
             
             # 处理响应
             processed_response = self.process_output(response)
@@ -258,7 +281,7 @@ class ReflectionSummaryNode(StateMutationNode):
             更新后的状态
         """
         try:
-            # 生成更新后的总结
+            # 生成更新后的总结，传递kwargs中的反思轮次信息
             updated_summary = self.run(input_data, **kwargs)
             
             # 更新状态

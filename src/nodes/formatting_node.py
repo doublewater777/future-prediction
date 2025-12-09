@@ -7,7 +7,7 @@ import json
 from typing import List, Dict, Any
 
 from .base_node import BaseNode
-from ..prompts import SYSTEM_PROMPT_REPORT_FORMATTING
+from ..prompts import SYSTEM_PROMPT_REPORT_FORMATTING, get_report_formatting_prompt
 from ..utils.text_processing import (
     remove_reasoning_from_output,
     clean_markdown_tags
@@ -17,14 +17,16 @@ from ..utils.text_processing import (
 class ReportFormattingNode(BaseNode):
     """格式化最终报告的节点"""
     
-    def __init__(self, llm_client):
+    def __init__(self, llm_client, time_horizon: str = None):
         """
         初始化报告格式化节点
         
         Args:
             llm_client: LLM客户端
+            time_horizon: 时间范围（未来简事专用）
         """
         super().__init__(llm_client, "ReportFormattingNode")
+        self.time_horizon = time_horizon
     
     def validate_input(self, input_data: Any) -> bool:
         """验证输入数据"""
@@ -67,8 +69,14 @@ class ReportFormattingNode(BaseNode):
             
             self.log_info("正在格式化最终报告")
             
+            # 选择提示词
+            if self.time_horizon:
+                prompt = get_report_formatting_prompt(self.time_horizon)
+            else:
+                prompt = SYSTEM_PROMPT_REPORT_FORMATTING
+            
             # 调用LLM
-            response = self.llm_client.invoke(SYSTEM_PROMPT_REPORT_FORMATTING, message)
+            response = self.llm_client.invoke(prompt, message)
             
             # 处理响应
             processed_response = self.process_output(response)
